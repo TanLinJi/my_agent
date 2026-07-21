@@ -4,8 +4,6 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI # OpenAI是openai库提供的客户端类
 
-
-
 # 2. 配置层
 # 从当前项目的 .env 文件加载环境变量
 load_dotenv() # 调用后 Python才能通过os.getenv来读取环境变量的值
