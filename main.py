@@ -15,7 +15,11 @@ def main() -> None:
         }
     ]
 
-    reply = generate_reply(messages)
+    try:
+        reply = generate_reply(messages)
+    except RuntimeError as error:
+        print(f"程序运行失败：{error}")
+
     print(reply)
 
 if __name__ == "__main__":
