@@ -5,12 +5,25 @@ EXIT_COMMANDS = {"exit", "quit", "/exit"}
 CLEAR_COMMAND = '/clear'
 
 # 最多保留最近 10 轮完整对话
-MAX_TRUMS = 10
+MAX_TURNS = 10 # 一轮对话包含1条 user 消息和一条 assitant 消息
 
 def trim_messages(messages: list[dict[str, str]]) -> list[dict[str, str]]:
     """
-    保留 system 消息和最近
+    保留 system 消息和最近 MAX_TURNS 轮对话
     """
+    # system 消息必须始终保留
+    system_message = messages[0]
+
+    # 除 system 消息外，其他都是对话历史
+    conversation_history = messages[1:]
+
+    # 一轮对话包含一条 user 消息和一条 assitant 消息
+    max_history_messages = MAX_TURNS * 2
+
+    # 从历史末尾截取最近的消息
+    recent_history = conversation_history[-max_history_messages:]
+
+    return [system_message, *recent_history]  # 相当于[system_message] + recent_history
 
 def main() -> None:
     """ 程序入口 """
@@ -38,7 +51,7 @@ def main() -> None:
 
         if user_input.lower() == CLEAR_COMMAND:
             messages = [ # 不能直接用messages.clear(), 这样会把system消息也删除，应该返回初始状态
-                {
+                {        # 其中 system 消息规定了 Agent 的身份和基本行为，执行 /clear 时，我们要清除的是：user + assistant
                     "role": "system",
                     "content": SYSTEM_PROMPT
                 }
@@ -68,6 +81,9 @@ def main() -> None:
                 "content": reply
             }
         )
+
+        # 保留 system 消息和最近 MAX_TURNS 轮完整对话
+        messages = trim_messages(messages)
 
         print(f"Agent:{reply}")
 
